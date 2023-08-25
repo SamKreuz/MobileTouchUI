@@ -1,0 +1,63 @@
+{
+    "name": "TouchActions",
+    "maps": [
+        {
+            "name": "Touch",
+            "id": "c9e23c0f-9bc7-4f80-a518-f0a2cb0bd680",
+            "actions": [
+                {
+                    "name": "SingleTouchPosition",
+                    "type": "Value",
+                    "id": "dbc94171-56da-42c3-afa4-97a7c550be07",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "SingleTouchPress",
+                    "type": "Button",
+                    "id": "02b08a25-2e16-4ddc-8d61-94d289321563",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Test",
+                    "type": "Value",
+                    "id": "68a86b50-dc1a-46a1-8a4b-ee830edc40a1",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8c2a22da-6c7d-465a-90e1-661b85a88e13",
+                    "path": "<Touchscreen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SingleTouchPosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3136a1ee-f592-4c6b-bd2b-5ea5859ef22c",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SingleTouchPress",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
