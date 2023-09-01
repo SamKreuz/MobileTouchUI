@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Samples/Input System/1.6.3/Visualizers/SimpleControlsVisualizer.unity
     guid: 14281ec1c6daa42bc97c543e027b5839
+  - enabled: 0
+    path: Assets/Samples/Input System/1.6.3/On-Screen Controls/OnScreenControlsSample.unity
+    guid: 011b162d4daa13c4ab03e94ad47b8258
   m_configObjects: {}

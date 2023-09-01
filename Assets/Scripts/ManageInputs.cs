@@ -1,56 +1,85 @@
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using EnhancedTouch = UnityEngine.InputSystem.EnhancedTouch;
 
 public class ManageInputs : MonoBehaviour
 {
     [SerializeField]
     private GameObject graphic;
+    private Dictionary<int, GameObject> circles = new();
+    private LineRenderer lineRenderer;
 
-    private PlayerInput playerInput;
-    private InputAction touchPositionAction;
-    private InputAction touchPressAction;
-    private InputAction touchPressureAction;
-
-    public void Awake()
+    protected void OnEnable()
     {
-        playerInput = GetComponent<PlayerInput>();
-        touchPositionAction = playerInput.actions["SingleTouchPosition"];
-        touchPressAction = playerInput.actions["SingleTouchPress"];
-        touchPressureAction = playerInput.actions["Test"];
+        EnhancedTouch.EnhancedTouchSupport.Enable();
+        EnhancedTouch.Touch.onFingerDown += Touch_onFingerDown;
+        EnhancedTouch.Touch.onFingerMove += Touch_onFingerMove;
+        EnhancedTouch.Touch.onFingerUp += Touch_onFingerUp;
+
+        //lineRenderer = new LineRenderer();
+        lineRenderer = this.GetComponent<LineRenderer>();
+    }
+
+    protected void OnDisable()
+    {
+        EnhancedTouch.EnhancedTouchSupport.Disable();
+        EnhancedTouch.Touch.onFingerDown -= Touch_onFingerDown;
+        EnhancedTouch.Touch.onFingerMove -= Touch_onFingerMove;
+        EnhancedTouch.Touch.onFingerUp -= Touch_onFingerUp;
     }
 
     public void Update()
     {
-        //float pressure = touchPressureAction.ReadValue<float>();
-        //Debug.Log(pressure);
-
-        if (Input.touchCount > 0)
+        if(circles.Count >= 2) 
         {
-            var touch = Input.GetTouch(0);
-            var fingerPosition = touch.position;
-            Debug.Log(fingerPosition);
-            var fingerWorldPosition = Camera.main.ScreenToWorldPoint(fingerPosition);
-            fingerWorldPosition.z = 0;
-            graphic.transform.position = fingerWorldPosition;
+            var pos1 = circles[0].transform.position;
+            var pos2 = circles[1].transform.position;
+            lineRenderer.SetPosition(0, pos1);
+            lineRenderer.SetPosition(1, pos2);
+            Debug.Log("Positions: " + pos1 + ", " + pos2);
         }
-
     }
 
-    private void OnEnable()
+    private void Touch_onFingerDown(EnhancedTouch.Finger finger)
     {
-        //touchPressAction.performed += TouchPressed;
-    }
-    private void OnDisable()
-    {
-        //touchPressAction.performed -= TouchPressed;
+        Debug.Log("New Finger Down: " + finger.index);
+
+        var newCircle = Instantiate(graphic, GetScreenPosition(finger), Quaternion.identity);
+
+        circles.Add(finger.index, newCircle);
     }
 
-    private void TouchPressed(InputAction.CallbackContext context)
+    /// <summary>
+    /// Gets called on every new frame that a finger moved
+    /// </summary>
+    /// <param name="finger"></param>
+    private void Touch_onFingerMove(EnhancedTouch.Finger finger)
     {
-        Vector2 fingerPosition = touchPositionAction.ReadValue<Vector2>();
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(fingerPosition);
-        worldPosition.z = 0;
+        Debug.Log("Finger moved: " + finger.index);
 
-        graphic.transform.position = worldPosition;
+        var currentCircle = circles[finger.index];
+
+        currentCircle.transform.position = GetScreenPosition(finger);
+    }
+
+    private void Touch_onFingerUp(EnhancedTouch.Finger finger)
+    {
+        var circleToRemove = circles[finger.index];
+        Destroy(circleToRemove);
+        circles.Remove(finger.index);
+
+        Debug.Log($"Circles left: {circles.Count}");
+    }
+
+    private Vector3 GetScreenPosition(EnhancedTouch.Finger finger)
+    {
+        var fingerPosition = finger.screenPosition;
+        var fingerWorldPosition = Camera.main.ScreenToWorldPoint(fingerPosition);
+        fingerWorldPosition.z = 0;
+
+        return fingerWorldPosition;
     }
 }
