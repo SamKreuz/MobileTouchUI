@@ -10,7 +10,7 @@ public class ManageInputs : MonoBehaviour
     [SerializeField] private GameObject graphic;
     [SerializeField] private Material lineMaterial;
 
-    private float lineWidth = 0.1f;
+    private float lineWidth = 0.025f;
     private Dictionary<int, GameObject> circles = new();
     private List<Line> linesList = new();
     private Animator animator;
@@ -31,9 +31,24 @@ public class ManageInputs : MonoBehaviour
         EnhancedTouch.Touch.onFingerUp -= Touch_onFingerUp;
     }
 
+    public void Start()
+    {
+        bool pressureSupport = Input.touchPressureSupported;
+        Debug.Log($"Pressure support: {pressureSupport}");
+    }
+
     public void Update()
     {
         // TODO SK: Delete when not needed anymore
+        var touches = EnhancedTouch.Touch.activeTouches;
+
+        foreach(var touch in touches)
+        {
+            var radius = touch.radius;
+            var position = touch.screenPosition;
+
+            Debug.Log($"Radius: {radius}, Position: {position}");
+        }
     }
 
     private void Touch_onFingerDown(EnhancedTouch.Finger finger)
@@ -41,18 +56,20 @@ public class ManageInputs : MonoBehaviour
         Debug.Log("New Finger Down: " + finger.index);
         Debug.Log("Active Lines: " + linesList.Count());
 
-        var newCircle = Instantiate(graphic, GetScreenPosition(finger), Quaternion.identity);
+        if(EnhancedTouch.Touch.activeTouches.Count <= 5 )
+        {
+            var newCircle = Instantiate(graphic, GetScreenPosition(finger), Quaternion.identity);
 
-        Guid newCircleId = Guid.NewGuid();
-        newCircle.name = newCircleId.ToString();
+            Guid newCircleId = Guid.NewGuid();
+            newCircle.name = newCircleId.ToString();
 
-        animator = newCircle.GetComponent<Animator>();
-        animator.Play("CircleScaleUp");
+            animator = newCircle.GetComponent<Animator>();
+            animator.Play("CircleScaleUp");
 
-        CreateLines(newCircle);
+            CreateLines(newCircle);
 
-        circles.Add(finger.index, newCircle);
-        //circlesList.Add(new Circle(finger.index, newCircle.name, newCircle));
+            circles.Add(finger.index, newCircle);
+        }
     }
 
     /// <summary>
@@ -82,7 +99,6 @@ public class ManageInputs : MonoBehaviour
 
         Destroy(circleToRemove);
         circles.Remove(finger.index);
-        //circlesList.RemoveAll(x => x.Index == finger.index);
 
         Debug.Log($"Circles left: {circles.Count}");
     }
